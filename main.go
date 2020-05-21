@@ -7,6 +7,11 @@ import (
 )
 
 func main() {
+    //starts the timer
+    timer := make(chan time.Time)
+    go startgame(timer)
+    timeVal := <- timer
+
     var r1 [2]int
     r1[0], r1[1] = 65, 80
     var r2 [2]int
