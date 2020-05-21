@@ -6,6 +6,7 @@ import (
     "math"
 )
 
+//takes 25 seconds from last bowser star until final black screen
 func main() {
     //starts the timer
     timer := make(chan time.Time)
