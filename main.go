@@ -74,25 +74,6 @@ func main() {
                     currentLevel = key
                 }
             }
-        }
-
-
-
-            dctArr := obtainDCT("cropped.png")
-            phashVal := phash(dctArr)
-            minDist := math.Inf(0)
-            currentLevel := ""
-            for key, value := range jsonFile {
-                hamming := hammingDistance(phashVal, value)
-                if float64(hamming) < minDist {
-                    minDist = float64(hamming)
-                    currentLevel = key
-                }
-            }
- 
-            fmt.Printf("%v\n", currentLevel)
-        } else if blackScreenBool == true {
-            blackScreenCt ++
-        }
+        }           
     }
 }
