@@ -20,19 +20,64 @@ func main() {
     jsonFile := readJSON()
     whiteScreenCt := 0
     blackScreenCt := 0
+
+    var startTime time.Time
+    whiteBool := false
+    blackBool := false
     for true {
         screenshotGrab(r1, r2)
-        whiteScreenBool := whiteScreen()
-        if whiteScreenBool == true {
-            whiteScreenCt = 1
+        if whiteScreen() {
+            blackScreenCt = 0
+            whiteScreenCt ++
+        } else if blackScreen() {
+            blackScreenCt ++
         }
-        blackScreenBool := blackScreen()
-        if blackScreenBool == true && whiteScreenCt == 1 {
-            // should be no instance where we have black then white again
-            whiteScreenCt = 0 
+        if whiteScreenCt == 1 && blackScreenCt == 1 {
+            startTime = time.Now()
+            whiteBool = true
             time.Sleep(5 * time.Second)
             screenshotGrab(r1, r2)
-            imgCrop("screenshot.png")
+        } else if blackScreenCt === 3 && whiteScreenCt == 0 {
+            startTime = time.Now()
+            blackBool = true
+            time.Sleep(5 * time.Second)
+            screenshotGrab(r1, r2)
+        }
+        if whiteBool == true {
+            whiteBool = false
+            whiteScreenCt = 0
+            blackScreenCt = 0
+            whiteImgCrop("screenshot.png")
+            dctArr := obtainDCT("cropped.png")
+            phashVal := phash(dctArr)
+            minDist := math.Inf(0)
+            for key, value := range jsonFile {
+                hamming := hammingDistance(phashVal, value)
+                if float64(hamming) < minDist {
+                    minDist = float64(hamming)
+                    currentLevel = key
+                }
+            }
+
+        } else if blackBool == true {
+            blackBool = false
+            whiteScreenCt = 0
+            blackScreenCt = 0
+            blackImgCrop("screenshot.png")
+            dctArr := obtainDCT("cropped.png")
+            phashVal := phash(dctArr)
+            minDist := math.Inf(0)
+            for key, value := range jsonFile {
+                hamming := hammingDistance(phashVal, value)
+                if float64(hamming) < minDist {
+                    minDist = float64(hamming)
+                    currentLevel = key
+                }
+            }
+        }
+
+
+
             dctArr := obtainDCT("cropped.png")
             phashVal := phash(dctArr)
             minDist := math.Inf(0)
