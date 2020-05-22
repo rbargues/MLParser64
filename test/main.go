@@ -61,6 +61,9 @@ func main() {
 	fmt.Printf("%v, %T\n", time.Since(parsed), time.Since(parsed))
 	fmt.Printf("%v, %T\n", bobGold, bobGold)
 
+	stringDuration := time.Since(parsed).String()
+	parsedDuration, _ := time.ParseDuration(stringDuration)
+	fmt.Printf("%v", parsedDuration)
 	times["bob-omb"]["gold-split"] = time.Now().Format(time.RFC3339Nano)
 	storeTimeJson(times)
 }
