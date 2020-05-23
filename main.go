@@ -14,6 +14,7 @@ func main() {
     timeVal := <- timer
     fmt.Printf("%v\n", timeVal)
 
+    time.Sleep(30 * time.Second)
     var r1 [2]int
     r1[0], r1[1] = 65, 80
     var r2 [2]int
@@ -96,6 +97,9 @@ func main() {
                     minDist = float64(hamming)
                     currentLevel = key
                 }
+            }
+            if currentLevel == "bowser3" {
+                fmt.Printf("Full Time: %v\n", endTime.Sub(timeVal))
             }
             fmt.Printf("%v: %v\n", currentLevel, endTime.Sub(startTime))
         }           
