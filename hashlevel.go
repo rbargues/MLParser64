@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 )
 
-func readJSON() map[string]string {
-	jsonFile, err := os.Open("levels.json")
+func readJSON(filename string) map[string]string {
+	jsonFile, err := os.Open(filename)
 	if err != nil {
 		panic(err)
 	}
