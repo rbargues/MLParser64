@@ -99,7 +99,7 @@ func main() {
                 }
             }
             if currentLevel == "bowser3" {
-                fmt.Printf("Full Time: %v\n", endTime.Sub(timeVal))
+                fmt.Printf("Full Time: %v\n", endTime.Sub(timeVal.Add(-25 * time.Second)))
             }
             fmt.Printf("%v: %v\n", currentLevel, endTime.Sub(startTime))
         }           
