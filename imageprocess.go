@@ -61,3 +61,31 @@ func blackScreen() bool{
 		return false
 	}
 }
+func redScreen(exitScreen chan bool) {
+	imageFile, err := os.Open("./temp-cropped.png")
+	if err != nil {
+		panic(err)
+	}
+	defer imageFile.Close()
+	imageInfo, err := png.Decode(imageFile)
+	if err != nil {
+		panic(err)
+	}
+	bounds := imageInfo.Bounds()
+
+	redCt := 0
+	for x := bounds.Min.X; x < bounds.Max.X; x++ {
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			rgba:= imageInfo.At(x,y).(color.RGBA)
+			// fmt.Printf("%v %v %v\n", rgba.R, rgba.G, rgba.B)
+			if (rgba.R >= 185 && rgba.R <= 255) && (rgba.G >= 105 && rgba.G <= 115) && (rgba.B >= 105 && rgba.B <= 115) {
+				redCt ++
+			}
+		}
+	}
+	if float64(redCt) / float64(bounds.Max.X * bounds.Max.Y) > 0.90 {
+		exitScreen <- true
+	} else {
+		exitScreen <- false
+	}
+}

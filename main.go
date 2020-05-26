@@ -14,7 +14,7 @@ func main() {
     timeVal := <- timer
     fmt.Printf("%v\n", timeVal)
 
-    time.Sleep(30 * time.Second)
+    // time.Sleep(30 * time.Second)
     var r1 [2]int
     r1[0], r1[1] = 65, 80
     var r2 [2]int
@@ -28,8 +28,9 @@ func main() {
     var endTime time.Time
     whiteBool := false
     blackBool := false
+    exitScreen := make(chan bool)
     for true {
-        screenshotGrab(r1, r2)
+        screenshotGrab(r1, r2, "screenshot.png")
         if whiteScreen() {
             if whiteScreenCt == 1 {
                 startTime = time.Now()
@@ -41,24 +42,39 @@ func main() {
             whiteScreenCt ++
             time.Sleep(400 * time.Millisecond)
         } else if blackScreen() {
-            if blackScreenCt == 0 && whiteScreenCt == 0{
+            if whiteScreenCt > 0 || blackScreenCt > 1 {
+                go func () {
+                    time.Sleep(1100 * time.Millisecond)
+                    screenshotGrab(r1, r2, "temp.png")
+                    exitCourseCrop("temp.png")
+                    redScreen(exitScreen)
+                    // fmt.Printf("%v\n",redScreen(exitScreen))
+                }()
+            }
+            blackScreenCt ++ 
+            if blackScreenCt == 1 && whiteScreenCt == 0{
                 startTime = time.Now()
-            }
-            if whiteScreenCt == 0 && blackScreenCt < 2 {
+            } else if whiteScreenCt == 0 && blackScreenCt < 3 {
                 time.Sleep(1 * time.Second)
+            } else if whiteScreenCt == 2 && blackScreenCt == 1 {
+                endTime = time.Now()
+                whiteBool = true
+                time.Sleep(5 * time.Second)
+                screenshotGrab(r1, r2, "screenshot.png")
+            } else if blackScreenCt == 3 && whiteScreenCt == 0 {
+                endTime = time.Now()
+                blackBool = true
+                time.Sleep(5 * time.Second)
+                screenshotGrab(r1, r2, "screenshot.png")
             }
-            blackScreenCt ++   
-        }
-        if whiteScreenCt == 2 && blackScreenCt == 1 {
-            endTime = time.Now()
-            whiteBool = true
-            time.Sleep(5 * time.Second)
-            screenshotGrab(r1, r2)
-        } else if blackScreenCt == 3 && whiteScreenCt == 0 {
-            endTime = time.Now()
-            blackBool = true
-            time.Sleep(5 * time.Second)
-            screenshotGrab(r1, r2)
+            exitBool := <- exitScreen
+            if exitBool {
+                fmt.Println("exited course\n")
+                whiteScreenCt = 0
+                blackScreenCt = 0
+                whiteBool = false
+                blackBool = false
+            }  
         }
         if whiteBool == true {
             whiteBool = false
@@ -89,10 +105,6 @@ func main() {
             currentLevel := ""
             for key, value := range bowserFile {
                 hamming := hammingDistance(phashVal, value)
-                fmt.Printf("%v, %v\n", key, hamming)
-                if hamming >= 200 {
-                    continue
-                }
                 if float64(hamming) < minDist {
                     minDist = float64(hamming)
                     currentLevel = key
