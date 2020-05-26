@@ -51,31 +51,30 @@ func main() {
                     // fmt.Printf("%v\n",redScreen(exitScreen))
                 }()
             }
-            if blackScreenCt == 0 && whiteScreenCt == 0{
-                startTime = time.Now()
-            }
-            if whiteScreenCt == 0 && blackScreenCt < 2 {
-                time.Sleep(1 * time.Second)
-            }
             blackScreenCt ++ 
+            if blackScreenCt == 1 && whiteScreenCt == 0{
+                startTime = time.Now()
+            } else if whiteScreenCt == 0 && blackScreenCt < 3 {
+                time.Sleep(1 * time.Second)
+            } else if whiteScreenCt == 2 && blackScreenCt == 1 {
+                endTime = time.Now()
+                whiteBool = true
+                time.Sleep(5 * time.Second)
+                screenshotGrab(r1, r2, "screenshot.png")
+            } else if blackScreenCt == 3 && whiteScreenCt == 0 {
+                endTime = time.Now()
+                blackBool = true
+                time.Sleep(5 * time.Second)
+                screenshotGrab(r1, r2, "screenshot.png")
+            }
             exitBool := <- exitScreen
-            fmt.Printf("%v\n", exitBool)
             if exitBool {
                 fmt.Println("exited course\n")
                 whiteScreenCt = 0
                 blackScreenCt = 0
+                whiteBool = false
+                blackBool = false
             }  
-        }
-        if whiteScreenCt == 2 && blackScreenCt == 1 {
-            endTime = time.Now()
-            whiteBool = true
-            time.Sleep(5 * time.Second)
-            screenshotGrab(r1, r2, "screenshot.png")
-        } else if blackScreenCt == 3 && whiteScreenCt == 0 {
-            endTime = time.Now()
-            blackBool = true
-            time.Sleep(5 * time.Second)
-            screenshotGrab(r1, r2, "screenshot.png")
         }
         if whiteBool == true {
             whiteBool = false
