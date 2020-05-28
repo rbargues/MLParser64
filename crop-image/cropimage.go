@@ -17,13 +17,13 @@ import (
 	cropInfo, _ := png.Decode(cropCopy)
 
 	bounds := cropInfo.Bounds()
-	imgWidth := int((math.Round(float64(bounds.Max.X) * (float64(30.0) / float64(1015.0)))))
-	imgHeight := int((math.Round(float64(bounds.Max.Y) * (float64(10) / float64(720)))))
+	imgWidth := int((math.Round(float64(bounds.Max.X) * (float64(100.0) / float64(1015.0)))))
+	imgHeight := int((math.Round(float64(bounds.Max.Y) * (float64(60.0) / float64(720)))))
 
 
 	// used to start cropping
-	newX := int(math.Round(float64(bounds.Max.X) * float64(450.0 / 1015.0)))
-	newY := int(math.Round(float64(bounds.Max.Y) * float64(350.0 / 720.0)))
+	newX := int(math.Round(float64(bounds.Max.X) * float64(170.0 / 1015.0)))
+	newY := int(math.Round(float64(bounds.Max.Y) * float64(20.0 / 720.0)))
 
 	m := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
 	draw.Draw(m, image.Rect(0, 0, imgWidth, imgHeight), cropInfo, image.Point{newX, newY}, draw.Src)
@@ -62,7 +62,32 @@ func redScreen() bool{
 		return false
 	}
 }
+func removeNonRed(input string, output string) {
+	copyImg, _ := os.Open(input)
+	defer copyImg.Close()
+	copyInfo, _ := png.Decode(copyImg)
+	bounds := copyInfo.Bounds()
+
+	m := image.NewRGBA(image.Rect(0, 0, bounds.Max.X, bounds.Max.Y))
+	imgColor := color.RGBA{0,0,0,255}
+
+	for x:= 0; x < bounds.Max.X; x++ {
+		for y := 0; y < bounds.Max.Y; y++ {
+			rgba := copyInfo.At(x, y).(color.RGBA)
+			if rgba.R < 240 {
+				m.Set(x, y, imgColor)
+			} else {
+				fmt.Printf("%v\n", rgba)
+				m.Set(x, y, rgba)
+			}
+		}
+	}
+	newImg, _ := os.Create(output)
+	defer newImg.Close()
+	png.Encode(newImg, m)
+}
 func main() {
 	imgCrop("temp.png")
-	fmt.Printf("%v",redScreen())
+	// fmt.Printf("%v",redScreen())
+	removeNonRed()
 }

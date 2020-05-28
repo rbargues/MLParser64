@@ -18,10 +18,8 @@ func save(img *image.RGBA, filePath string) {
 
 func screenshotGrab(r1 [2]int, r2 [2]int, filename string) {
 	captureRectangle := image.Rect(r1[0], r1[1], r2[0], r2[1])
-	img, err := screenshot.CaptureRect(captureRectangle)
-	if err != nil {
-		panic(err)
-	}
+	img, _ := screenshot.CaptureRect(captureRectangle)
 	// filepath := fmt.Sprintf("screenshot.png")
 	save(img, filename)
 }
+

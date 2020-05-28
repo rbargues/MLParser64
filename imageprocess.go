@@ -3,12 +3,13 @@ package main
 import (
 	"os"
 	// "fmt"
+	"image"
 	"image/png"
 	"image/color"
 )
 
-func whiteScreen() bool {
-	imageFile, err := os.Open("./screenshot.png")
+func whiteScreen(fname string) bool {
+	imageFile, err := os.Open(fname)
 	if err != nil {
 		panic(err)
 	}
@@ -34,8 +35,8 @@ func whiteScreen() bool {
 		return false
 	}
 }
-func blackScreen() bool{
-	imageFile, err := os.Open("./screenshot.png")
+func blackScreen(fname string) bool{
+	imageFile, err := os.Open(fname)
 	if err != nil {
 		panic(err)
 	}
@@ -87,5 +88,51 @@ func redScreen(exitScreen chan bool) {
 		exitScreen <- true
 	} else {
 		exitScreen <- false
+	}
+}
+
+func removeNonRed(input string, output string) {
+	copyImg, _ := os.Open(input)
+	defer copyImg.Close()
+	copyInfo, _ := png.Decode(copyImg)
+	bounds := copyInfo.Bounds()
+
+	m := image.NewRGBA(image.Rect(0, 0, bounds.Max.X, bounds.Max.Y))
+	imgColor := color.RGBA{0,0,0,255}
+
+	for x:= 0; x < bounds.Max.X; x++ {
+		for y := 0; y < bounds.Max.Y; y++ {
+			rgba := copyInfo.At(x, y).(color.RGBA)
+			if rgba.R < 240 {
+				m.Set(x, y, imgColor)
+			} else if rgba.B != 0 {
+				m.Set(x, y, imgColor)
+			} else {
+				m.Set(x, y, rgba)
+			}
+		}
+	}
+	newImg, _ := os.Create(output)
+	defer newImg.Close()
+	png.Encode(newImg, m)
+}
+func compareLifeCounts (img1 string, img2 string, img3 string) {
+	dct1 := obtainDCT(img1)
+	dct2 := obtainDCT(img2)
+	dct3 := obtainDCT(img3)
+
+	phashVal1 := phash(dct1)
+	phashVal2 := phash(dct2)
+	phashVal3 := phash(dct3)
+
+	hamming1 := hammingDistance(phashVal2, phashVal1)
+	hamming2 := hammingDistance(phashVal2, phashVal3)
+
+	if hamming1 < hamming2 {
+        fmt.Printf("more similar to first %v %v\n", hamming1, hamming2)
+		fmt.Printf("%v\n", "life count changed")
+	} else {
+        fmt.Printf("more similar to second %v %v\n", hamming1, hamming2)
+		fmt.Printf("%v\n", "life count is the same")
 	}
 }

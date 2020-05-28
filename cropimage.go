@@ -84,3 +84,27 @@ func exitCourseCrop(fname string) {
 
     png.Encode(newImg, m)
 }
+func lifeCrop(fname string, outname string){
+	//450-350 	480-360
+ cropCopy, _ := os.Open(fname)
+ //630, 470
+ defer cropCopy.Close()
+ cropInfo, _ := png.Decode(cropCopy)
+
+ bounds := cropInfo.Bounds()
+ imgWidth := int((math.Round(float64(bounds.Max.X) * (float64(100.0) / float64(1015.0)))))
+ imgHeight := int((math.Round(float64(bounds.Max.Y) * (float64(60.0) / float64(720)))))
+
+
+ // used to start cropping
+ newX := int(math.Round(float64(bounds.Max.X) * float64(170.0 / 1015.0)))
+ newY := int(math.Round(float64(bounds.Max.Y) * float64(20.0 / 720.0)))
+
+ m := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
+ draw.Draw(m, image.Rect(0, 0, imgWidth, imgHeight), cropInfo, image.Point{newX, newY}, draw.Src)
+
+ newImg, _ := os.Create(outname)
+ defer newImg.Close()
+
+ png.Encode(newImg, m)
+}

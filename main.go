@@ -28,10 +28,23 @@ func main() {
     var endTime time.Time
     whiteBool := false
     blackBool := false
+    pause := false
     exitScreen := make(chan bool)
+    go func() {
+        for true {
+            if blackBool || whiteBool || pause {
+                continue
+            }
+            screenshotGrab(r1, r2, "life.png")
+            if !blackScreen("life.png") {
+                lifeCrop("life.png", "life1.png")
+            }
+        }
+        
+    }()
     for true {
         screenshotGrab(r1, r2, "screenshot.png")
-        if whiteScreen() {
+        if whiteScreen("screenshot.png") {
             if whiteScreenCt == 1 {
                 startTime = time.Now()
                 time.Sleep(1000 * time.Millisecond)
@@ -41,7 +54,7 @@ func main() {
             blackScreenCt = 0
             whiteScreenCt ++
             time.Sleep(400 * time.Millisecond)
-        } else if blackScreen() {
+        } else if blackScreen("screenshot.png") {
             if whiteScreenCt > 0 || blackScreenCt > 1 {
                 go func () {
                     time.Sleep(1100 * time.Millisecond)
@@ -59,6 +72,20 @@ func main() {
             } else if whiteScreenCt == 2 && blackScreenCt == 1 {
                 endTime = time.Now()
                 whiteBool = true
+                go func() {
+                    pause = true
+                    // tempDct := obtainDCT("life1.png")
+                    time.Sleep(1300 * time.Millisecond)
+                    screenshotGrab(r1, r2, "postlife1.png")
+                    lifeCrop("postlife1.png", "life2.png")
+                    removeNonRed("life2.png", "formatlife2.png")
+                    screenshotGrab(r1, r2, "postlife2.png")
+                    lifeCrop("postlife2.png", "life3.png")
+                    removeNonRed("life3.png", "formatlife3.png")
+                    removeNonRed("life1.png", "formatlife1.png")
+                    compareLifeCounts("formatlife1.png","formatlife2.png","formatlife3.png")
+                    // pause = false
+                }()
                 time.Sleep(5 * time.Second)
                 screenshotGrab(r1, r2, "screenshot.png")
             } else if blackScreenCt == 3 && whiteScreenCt == 0 {
