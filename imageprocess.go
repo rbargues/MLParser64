@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	// "fmt"
+	"fmt"
 	"image"
 	"image/png"
 	"image/color"
@@ -134,5 +134,32 @@ func compareLifeCounts (img1 string, img2 string, img3 string) {
 	} else {
         fmt.Printf("more similar to second %v %v\n", hamming1, hamming2)
 		fmt.Printf("%v\n", "life count is the same")
+	}
+}
+func blackScreenLife(fname string) bool{
+	imageFile, err := os.Open(fname)
+	if err != nil {
+		panic(err)
+	}
+	defer imageFile.Close()
+	imageInfo, err := png.Decode(imageFile)
+	if err != nil {
+		panic(err)
+	}
+	bounds := imageInfo.Bounds()
+
+	blackPixelCount := 0
+	for x := bounds.Min.X; x < 5; x++ {
+		for y := bounds.Min.Y; y < 5; y++ {
+			rgba:= imageInfo.At(x,y).(color.RGBA)
+			if rgba.R < 60 && rgba.B < 60 && rgba.G < 60 {
+				blackPixelCount ++
+			}
+		}
+	}
+	if float64(blackPixelCount) / float64(25) > 0.99 {
+		return true
+	} else {
+		return false
 	}
 }

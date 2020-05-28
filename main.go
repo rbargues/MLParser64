@@ -32,15 +32,17 @@ func main() {
     exitScreen := make(chan bool)
     go func() {
         for true {
-            if blackBool || whiteBool || pause {
+            if pause {
                 continue
             }
             screenshotGrab(r1, r2, "life.png")
             if !blackScreen("life.png") {
-                lifeCrop("life.png", "life1.png")
+                lifeCrop("life.png", "lifeTEMP.png")
+                if !blackScreenLife("lifeTEMP.png") {
+                    lifeCrop("life.png", "life1.png")
+                }
             }
         }
-        
     }()
     for true {
         screenshotGrab(r1, r2, "screenshot.png")
@@ -72,9 +74,8 @@ func main() {
             } else if whiteScreenCt == 2 && blackScreenCt == 1 {
                 endTime = time.Now()
                 whiteBool = true
+                pause = true
                 go func() {
-                    pause = true
-                    // tempDct := obtainDCT("life1.png")
                     time.Sleep(1300 * time.Millisecond)
                     screenshotGrab(r1, r2, "postlife1.png")
                     lifeCrop("postlife1.png", "life2.png")
@@ -84,7 +85,7 @@ func main() {
                     removeNonRed("life3.png", "formatlife3.png")
                     removeNonRed("life1.png", "formatlife1.png")
                     compareLifeCounts("formatlife1.png","formatlife2.png","formatlife3.png")
-                    // pause = false
+                    pause = false
                 }()
                 time.Sleep(5 * time.Second)
                 screenshotGrab(r1, r2, "screenshot.png")
