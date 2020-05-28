@@ -12,13 +12,29 @@ func main() {
     timer := make(chan time.Time)
     go startgame(timer)
     timeVal := <- timer
-    fmt.Printf("%v\n", timeVal)
+    // fmt.Printf("%v\n", timeVal)
 
-    // time.Sleep(30 * time.Second)
+    var totalTime time.Time
+    continueTime := true
+
+    go func () {
+        for (continueTime) {
+            totalTime = time.Now()
+            fmt.Print("\r", "Total time: ", totalTime.Sub(timeVal))
+        }
+    } ()
+
+    // for true { fmt.Print("Hello WURLD") }
+
+    time.Sleep(30 * time.Second)
+
     var r1 [2]int
-    r1[0], r1[1] = 65, 80
+    // r1[0], r1[1] = 65, 80
+    r1[0], r1[1] = 10, 847
     var r2 [2]int
-    r2[0], r2[1] = 1080, 800
+    // r2[0], r2[1] = 1080, 800
+    r2[0], r2[1] = 855, 226
+
     jsonFile := readJSON("levels.json")
     bowserFile := readJSON("bowsers.json")
     whiteScreenCt := 0
@@ -111,6 +127,7 @@ func main() {
                 }
             }
             if currentLevel == "bowser3" {
+                continueTime = false;
                 fmt.Printf("Full Time: %v\n", endTime.Sub(timeVal.Add(-25 * time.Second)))
             }
             fmt.Printf("%v: %v\n", currentLevel, endTime.Sub(startTime))
